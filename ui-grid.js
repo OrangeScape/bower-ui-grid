@@ -4810,10 +4810,13 @@ angular.module('ui.grid')
    */
   Grid.prototype.getCellValue = function getCellValue(row, col){
     if (this.options.flatEntityAccess && col.field){
-      return row.entity[col.field];      
+      console.log(row.entity);
+      return row.entity.__wrappedData__[col.field];      
     } else {
       if (!col.cellValueGetterCache) {
+        console.log(row.entity.__wrappedData__[col.field]);
         col.cellValueGetterCache = $parse(row.getEntityQualifiedColField(col));
+        console.log(row.getEntityQualifiedColField(col));
       }
   
       return col.cellValueGetterCache(row);
@@ -4893,7 +4896,7 @@ angular.module('ui.grid')
   Grid.prototype.sortColumn = function sortColumn(column, directionOrAdd, add) {
     var self = this,
         direction = null;
-
+    console.log(column);
     if (typeof(column) === 'undefined' || !column) {
       throw new Error('No column parameter provided');
     }
@@ -8056,7 +8059,8 @@ angular.module('ui.grid')
      * @returns {string} resulting name that can be evaluated against a row
      */
   GridRow.prototype.getEntityQualifiedColField = function(col) {
-    return gridUtil.preEval('entity.' + col.field);
+    //return gridUtil.preEval('entity.__wrappedData__.' + col.field);
+    return 'entity.getValue(\''+col.field+'\')';
   };
   
   
@@ -8887,7 +8891,6 @@ module.service('rowSearcher', ['gridUtil', 'uiGridConstants', function (gridUtil
     var colsLength = columns.length;
     for (var i = 0; i < colsLength; i++) {
       var col = columns[i];
-
       if (typeof(col.filters) !== 'undefined' && ( col.filters.length > 1 || col.filters.length === 1 && ( !gridUtil.isNullOrUndefined(col.filters[0].term) || col.filters[0].noTerm ) ) ) {
         filterData.push( { col: col, filters: rowSearcher.setupFilters(col.filters) } );
       }
@@ -10418,6 +10421,7 @@ module.service('gridUtil', ['$log', '$window', '$document', '$http', '$templateC
       angular.forEach(parts, function (part) {
         preparsed.push(part.replace(uiGridConstants.FUNC_REGEXP, '\']$1'));
       });
+      console.log(preparsed);
       return preparsed.join('[\'');
     }
   };
@@ -14148,7 +14152,7 @@ module.filter('px', function() {
               origCellValue = cellModel($scope);
 
               html = $scope.col.editableCellTemplate;
-              html = html.replace(uiGridConstants.MODEL_COL_FIELD, $scope.row.getQualifiedColField($scope.col));
+              html = html.replace(uiGridConstants.MODEL_COL_FIELD, "row.entity.getterSetter('" + $scope.col.field + "')");
 
               var optionFilter = $scope.col.colDef.editDropdownFilter ? '|' + $scope.col.colDef.editDropdownFilter : '';
               html = html.replace(uiGridConstants.CUSTOM_FILTERS, optionFilter);
