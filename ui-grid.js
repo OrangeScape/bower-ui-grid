@@ -8055,7 +8055,7 @@ angular.module('ui.grid')
      * @returns {string} resulting name that can be evaluated against a row
      */
   GridRow.prototype.getEntityQualifiedColField = function(col) {
-    //return gridUtil.preEval('entity.__wrappedData__.' + col.field);
+    //return gridUtil.preEval('entity.' + col.field);
     return 'entity.getValue(\''+col.field+'\')';
   };
   
@@ -14147,6 +14147,7 @@ module.filter('px', function() {
               origCellValue = cellModel($scope);
 
               html = $scope.col.editableCellTemplate;
+              // html = html.replace(uiGridConstants.MODEL_COL_FIELD, $scope.row.getQualifiedColField($scope.col));
               html = html.replace(uiGridConstants.MODEL_COL_FIELD, "row.entity.getterSetter('" + $scope.col.field + "')");
 
               var optionFilter = $scope.col.colDef.editDropdownFilter ? '|' + $scope.col.colDef.editDropdownFilter : '';
