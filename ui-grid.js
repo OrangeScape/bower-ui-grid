@@ -4810,7 +4810,7 @@ angular.module('ui.grid')
    */
   Grid.prototype.getCellValue = function getCellValue(row, col){
     if (this.options.flatEntityAccess && col.field){
-      return row.entity[col.field];      
+      return row.entity[col.field];  
     } else {
       if (!col.cellValueGetterCache) {
         col.cellValueGetterCache = $parse(row.getEntityQualifiedColField(col));
@@ -4893,7 +4893,6 @@ angular.module('ui.grid')
   Grid.prototype.sortColumn = function sortColumn(column, directionOrAdd, add) {
     var self = this,
         direction = null;
-
     if (typeof(column) === 'undefined' || !column) {
       throw new Error('No column parameter provided');
     }
@@ -8056,7 +8055,8 @@ angular.module('ui.grid')
      * @returns {string} resulting name that can be evaluated against a row
      */
   GridRow.prototype.getEntityQualifiedColField = function(col) {
-    return gridUtil.preEval('entity.' + col.field);
+    //return gridUtil.preEval('entity.' + col.field);
+    return 'entity.getValue(\''+col.field+'\')';
   };
   
   
@@ -8887,7 +8887,6 @@ module.service('rowSearcher', ['gridUtil', 'uiGridConstants', function (gridUtil
     var colsLength = columns.length;
     for (var i = 0; i < colsLength; i++) {
       var col = columns[i];
-
       if (typeof(col.filters) !== 'undefined' && ( col.filters.length > 1 || col.filters.length === 1 && ( !gridUtil.isNullOrUndefined(col.filters[0].term) || col.filters[0].noTerm ) ) ) {
         filterData.push( { col: col, filters: rowSearcher.setupFilters(col.filters) } );
       }
@@ -14148,7 +14147,8 @@ module.filter('px', function() {
               origCellValue = cellModel($scope);
 
               html = $scope.col.editableCellTemplate;
-              html = html.replace(uiGridConstants.MODEL_COL_FIELD, $scope.row.getQualifiedColField($scope.col));
+              // html = html.replace(uiGridConstants.MODEL_COL_FIELD, $scope.row.getQualifiedColField($scope.col));
+              html = html.replace(uiGridConstants.MODEL_COL_FIELD, "row.entity.getterSetter('" + $scope.col.field + "')");
 
               var optionFilter = $scope.col.colDef.editDropdownFilter ? '|' + $scope.col.colDef.editDropdownFilter : '';
               html = html.replace(uiGridConstants.CUSTOM_FILTERS, optionFilter);
