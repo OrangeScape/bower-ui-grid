@@ -4810,13 +4810,10 @@ angular.module('ui.grid')
    */
   Grid.prototype.getCellValue = function getCellValue(row, col){
     if (this.options.flatEntityAccess && col.field){
-      console.log(row.entity);
-      return row.entity.__wrappedData__[col.field];      
+      return row.entity[col.field];  
     } else {
       if (!col.cellValueGetterCache) {
-        console.log(row.entity.__wrappedData__[col.field]);
         col.cellValueGetterCache = $parse(row.getEntityQualifiedColField(col));
-        console.log(row.getEntityQualifiedColField(col));
       }
   
       return col.cellValueGetterCache(row);
@@ -4896,7 +4893,6 @@ angular.module('ui.grid')
   Grid.prototype.sortColumn = function sortColumn(column, directionOrAdd, add) {
     var self = this,
         direction = null;
-    console.log(column);
     if (typeof(column) === 'undefined' || !column) {
       throw new Error('No column parameter provided');
     }
@@ -10421,7 +10417,6 @@ module.service('gridUtil', ['$log', '$window', '$document', '$http', '$templateC
       angular.forEach(parts, function (part) {
         preparsed.push(part.replace(uiGridConstants.FUNC_REGEXP, '\']$1'));
       });
-      console.log(preparsed);
       return preparsed.join('[\'');
     }
   };
