@@ -2227,7 +2227,7 @@ function ($compile, $timeout, $window, $document, gridUtil, uiGridConstants) {
               var footerViewportWidth = colContainer.getHeaderViewportWidth();
 
               // Set canvas dimensions
-              ret += '\n .grid' + uiGridCtrl.grid.id + ' .ui-grid-render-container-' + $scope.containerId + ' .ui-grid-canvas { width: ' + canvasWidth + 'px; height: ' + canvasHeight + 'px; }';
+              ret += '\n .grid' + uiGridCtrl.grid.id + ' .ui-grid-render-container-' + $scope.containerId + ' .ui-grid-canvas { width: ' + canvasWidth + 'px; height: auto; }';
 
               ret += '\n .grid' + uiGridCtrl.grid.id + ' .ui-grid-render-container-' + $scope.containerId + ' .ui-grid-header-canvas { width: ' + (canvasWidth + grid.scrollbarWidth) + 'px; }';
 
@@ -13010,7 +13010,7 @@ module.filter('px', function() {
             (evt.keyCode === uiGridConstants.keymap.TAB && evt.shiftKey)) {
             return uiGridCellNavConstants.direction.LEFT;
           }
-          if (evt.keyCode === uiGridConstants.keymap.RIGHT ||
+          if (/*evt.keyCode === uiGridConstants.keymap.RIGHT ||*/
             evt.keyCode === uiGridConstants.keymap.TAB) {
             return uiGridCellNavConstants.direction.RIGHT;
           }
@@ -13024,8 +13024,8 @@ module.filter('px', function() {
             return uiGridCellNavConstants.direction.PG_UP;
           }
 
-          if (evt.keyCode === uiGridConstants.keymap.DOWN ||
-            evt.keyCode === uiGridConstants.keymap.ENTER) {
+          if (evt.keyCode === uiGridConstants.keymap.DOWN /*||
+            evt.keyCode === uiGridConstants.keymap.ENTER*/) {
             return uiGridCellNavConstants.direction.DOWN;
           }
 
@@ -14337,9 +14337,9 @@ module.filter('px', function() {
                       evt.stopPropagation();
                       $scope.$emit(uiGridEditConstants.events.CANCEL_CELL_EDIT);
                       break;
-                    case uiGridConstants.keymap.ENTER: // Enter (Leave Field)
+                    /*case uiGridConstants.keymap.ENTER: // Enter (Leave Field)
                       $scope.stopEdit(evt);
-                      break;
+                      break;*/
                     case uiGridConstants.keymap.TAB:
                       $scope.stopEdit(evt);
                       break;
@@ -14488,9 +14488,9 @@ module.filter('px', function() {
                       evt.stopPropagation();
                       $scope.$emit(uiGridEditConstants.events.CANCEL_CELL_EDIT);
                       break;
-                    case uiGridConstants.keymap.ENTER: // Enter (Leave Field)
+                    /*case uiGridConstants.keymap.ENTER: // Enter (Leave Field)
                       $scope.stopEdit(evt);
-                      break;
+                      break;*/
                     case uiGridConstants.keymap.LEFT:
                       $scope.stopEdit(evt);
                       break;
@@ -24077,7 +24077,7 @@ angular.module('ui.grid').run(['$templateCache', function($templateCache) {
     "    }\n" +
     "\n" +
     "    .grid{{ grid.id }} .ui-grid-row, .grid{{ grid.id }} .ui-grid-cell, .grid{{ grid.id }} .ui-grid-cell .ui-grid-vertical-bar {\n" +
-    "      height: {{ grid.options.rowHeight }}px;\n" +
+    "      \n" +
     "    }\n" +
     "\n" +
     "    .grid{{ grid.id }} .ui-grid-row:last-child .ui-grid-cell {\n" +
