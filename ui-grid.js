@@ -8056,7 +8056,7 @@ angular.module('ui.grid')
      */
   GridRow.prototype.getEntityQualifiedColField = function(col) {
     //return gridUtil.preEval('entity.' + col.field);
-    return 'entity.getValue(\''+col.field+'\')';
+    return 'entity.getDisplayValue(\''+col.field+'\',\''+col.colDef.format+'\')';
   };
   
   
@@ -8983,6 +8983,8 @@ module.service('rowSorter', ['$parse', 'uiGridConstants', function ($parse, uiGr
       case "boolean":
         return rowSorter.sortBool;
       case "string":
+        return rowSorter.sortAlpha;
+      case "text":
         return rowSorter.sortAlpha;
       case "date":
         return rowSorter.sortDate;
@@ -14148,7 +14150,7 @@ module.filter('px', function() {
 
               html = $scope.col.editableCellTemplate;
               // html = html.replace(uiGridConstants.MODEL_COL_FIELD, $scope.row.getQualifiedColField($scope.col));
-              html = html.replace(uiGridConstants.MODEL_COL_FIELD, "row.entity.getterSetter('" + $scope.col.field + "')");
+              html = html.replace(uiGridConstants.MODEL_COL_FIELD, "row.entity.getterSetter('" + $scope.col.field + "','"+$scope.col.colDef.format+"')");
 
               var optionFilter = $scope.col.colDef.editDropdownFilter ? '|' + $scope.col.colDef.editDropdownFilter : '';
               html = html.replace(uiGridConstants.CUSTOM_FILTERS, optionFilter);
