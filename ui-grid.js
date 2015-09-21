@@ -1,5 +1,5 @@
 /*!
- * ui-grid - v3.0.5 - 2015-08-26
+ * ui-grid - v3.0.6 - 2015-09-10
  * Copyright (c) 2015 ; License: MIT 
  */
 
@@ -11533,7 +11533,7 @@ module.service('gridUtil', ['$log', '$window', '$document', '$http', '$templateC
     }
   };
   s.off.mousewheel = function (elm, fn) {
-    var $elm = angular.element(this);
+    var $elm = angular.element(elm);
 
     var cbs = $elm.data('mousewheel-callbacks');
     var handler = cbs[fn];
@@ -14229,7 +14229,7 @@ module.filter('px', function() {
          * @returns {uiGridCellNavConstants.direction} direction
          */
         getDirection: function (evt) {
-          if (evt.keyCode === uiGridConstants.keymap.LEFT ||
+          if (/*evt.keyCode === uiGridConstants.keymap.LEFT ||*/
             (evt.keyCode === uiGridConstants.keymap.TAB && evt.shiftKey)) {
             return uiGridCellNavConstants.direction.LEFT;
           }
@@ -14238,7 +14238,7 @@ module.filter('px', function() {
             return uiGridCellNavConstants.direction.RIGHT;
           }
 
-          if (evt.keyCode === uiGridConstants.keymap.UP ||
+          if (/*evt.keyCode === uiGridConstants.keymap.UP||*/ 
             (evt.keyCode === uiGridConstants.keymap.ENTER && evt.shiftKey) ) {
             return uiGridCellNavConstants.direction.UP;
           }
@@ -14247,13 +14247,8 @@ module.filter('px', function() {
             return uiGridCellNavConstants.direction.PG_UP;
           }
 
-// <<<<<<< HEAD
-//           if (evt.keyCode === uiGridConstants.keymap.DOWN ||
-//             evt.keyCode === uiGridConstants.keymap.ENTER) {
-// =======
-          if (evt.keyCode === uiGridConstants.keymap.DOWN ||
+          if (/*evt.keyCode === uiGridConstants.keymap.DOWN ||*/
             evt.keyCode === uiGridConstants.keymap.ENTER && !(evt.ctrlKey || evt.altKey)) {
-// >>>>>>> d6dee7f114fc7d5e1f3a99551ca19f6d4d6a0849
             return uiGridCellNavConstants.direction.DOWN;
           }
 
@@ -14879,6 +14874,12 @@ module.filter('px', function() {
           function setFocused() {
             if (!$scope.focused){
               var div = $elm.find('div');
+              if(div.length == 0 && $elm.find('i').length>0){
+                var div = $elm.find('i');
+              }
+              if(div.length == 0 && $elm.find('input').length>0){
+                var div = $elm.find('input');
+              }
               div.addClass('ui-grid-cell-focus');
               $elm.attr('aria-selected', true);
               uiGridCellnavCtrl.setAriaActivedescendant($elm.attr('id'));
@@ -14889,6 +14890,12 @@ module.filter('px', function() {
           function clearFocus() {
             if ($scope.focused){
               var div = $elm.find('div');
+              if(div.length == 0 && $elm.find('i').length>0){
+                var div = $elm.find('i');
+              }
+              if(div.length == 0 && $elm.find('input').length>0){
+                var div = $elm.find('input');
+              }
               div.removeClass('ui-grid-cell-focus');
               $elm.attr('aria-selected', false);
               uiGridCellnavCtrl.removeAriaActivedescendant($elm.attr('id'));
@@ -17285,7 +17292,11 @@ module.filter('px', function() {
           if ( colTypes === uiGridExporterConstants.ALL ){
             columns = grid.columns;
           } else {
-            columns = grid.renderContainers.body.visibleColumnCache.filter( function( column ){ return column.visible; } );
+            var leftColumns = grid.renderContainers.left ? grid.renderContainers.left.visibleColumnCache.filter( function( column ){ return column.visible; } ) : [];
+            var bodyColumns = grid.renderContainers.body ? grid.renderContainers.body.visibleColumnCache.filter( function( column ){ return column.visible; } ) : [];
+            var rightColumns = grid.renderContainers.right ? grid.renderContainers.right.visibleColumnCache.filter( function( column ){ return column.visible; } ) : [];
+
+            columns = leftColumns.concat(bodyColumns,rightColumns);
           }
 
           columns.forEach( function( gridCol, index ) {
@@ -17367,7 +17378,11 @@ module.filter('px', function() {
           if ( colTypes === uiGridExporterConstants.ALL ){
             columns = grid.columns;
           } else {
-            columns = grid.renderContainers.body.visibleColumnCache.filter( function( column ){ return column.visible; } );
+            var leftColumns = grid.renderContainers.left ? grid.renderContainers.left.visibleColumnCache.filter( function( column ){ return column.visible; } ) : [];
+            var bodyColumns = grid.renderContainers.body ? grid.renderContainers.body.visibleColumnCache.filter( function( column ){ return column.visible; } ) : [];
+            var rightColumns = grid.renderContainers.right ? grid.renderContainers.right.visibleColumnCache.filter( function( column ){ return column.visible; } ) : [];
+
+            columns = leftColumns.concat(bodyColumns,rightColumns);
           }
 
           rows.forEach( function( row, index ) {
@@ -18464,7 +18479,7 @@ module.filter('px', function() {
        */
       moveGroupColumns: function( grid, columns, rows ){
         if ( grid.options.moveGroupColumns === false){
-          return;
+          return columns;
         }
 
         columns.forEach( function(column, index){
@@ -20009,8 +20024,8 @@ module.filter('px', function() {
                * used if you're subsequently going to call `dataRemovedTop` or `dataRemovedBottom`
                */
               saveScrollPercentage: function() {
-                grid.infiniteScroll.prevScrolltopPercentage = grid.renderContainers.body.prevScrolltopPercentage;
-                grid.infiniteScroll.previousVisibleRows = grid.renderContainers.body.visibleRowCache.length;
+                grid.infiniteScroll.prevScrollTop = grid.renderContainers.body.prevScrollTop;
+                grid.infiniteScroll.previousVisibleRows = grid.getVisibleRowCount();
               },
 
 
@@ -20187,7 +20202,7 @@ module.filter('px', function() {
         // to be at approximately the row we're currently at
         grid.infiniteScroll.previousVisibleRows = grid.renderContainers.body.visibleRowCache.length;
         grid.infiniteScroll.direction = grid.scrollDirection;
-        delete grid.infiniteScroll.prevScrolltopPercentage;
+        delete grid.infiniteScroll.prevScrollTop;
 
         if (grid.scrollDirection === uiGridConstants.scrollDirection.UP && grid.infiniteScroll.scrollUp ) {
           grid.infiniteScroll.dataLoading = true;
@@ -20223,32 +20238,30 @@ module.filter('px', function() {
       adjustScroll: function(grid){
         var promise = $q.defer();
         $timeout(function () {
-          var newPercentage;
+          var newPercentage, viewportHeight, rowHeight, newVisibleRows, oldTop, newTop;
+
+          viewportHeight = grid.getViewportHeight() + grid.headerHeight - grid.renderContainers.body.headerHeight - grid.scrollbarHeight;
+          rowHeight = grid.options.rowHeight;
 
           if ( grid.infiniteScroll.direction === undefined ){
             // called from initialize, tweak our scroll up a little
             service.adjustInfiniteScrollPosition(grid, 0);
           }
 
-          var newVisibleRows = grid.renderContainers.body.visibleRowCache.length;
-          var oldPercentage, oldTopRow;
-          var halfViewport = grid.getViewportHeight() / grid.options.rowHeight / 2;
+          newVisibleRows = grid.getVisibleRowCount();
 
           if ( grid.infiniteScroll.direction === uiGridConstants.scrollDirection.UP ){
-            oldPercentage = grid.infiniteScroll.prevScrolltopPercentage || 0;
-            oldTopRow = oldPercentage * grid.infiniteScroll.previousVisibleRows;
-            newPercentage = ( newVisibleRows - grid.infiniteScroll.previousVisibleRows + oldTopRow + halfViewport ) / newVisibleRows;
-            service.adjustInfiniteScrollPosition(grid, newPercentage);
+            oldTop = grid.infiniteScroll.prevScrollTop || 0;
+            newTop = oldTop + (newVisibleRows - grid.infiniteScroll.previousVisibleRows)*rowHeight;
+            service.adjustInfiniteScrollPosition(grid, newTop);
             $timeout( function() {
               promise.resolve();
             });
           }
 
           if ( grid.infiniteScroll.direction === uiGridConstants.scrollDirection.DOWN ){
-            oldPercentage = grid.infiniteScroll.prevScrolltopPercentage || 1;
-            oldTopRow = oldPercentage * grid.infiniteScroll.previousVisibleRows;
-            newPercentage = ( oldTopRow - halfViewport ) / newVisibleRows;
-            service.adjustInfiniteScrollPosition(grid, newPercentage);
+            newTop = grid.infiniteScroll.prevScrollTop || (grid.infiniteScroll.previousVisibleRows*rowHeight - viewportHeight);
+            service.adjustInfiniteScrollPosition(grid, newTop);
             $timeout( function() {
               promise.resolve();
             });
@@ -20265,18 +20278,23 @@ module.filter('px', function() {
        * @methodOf ui.grid.infiniteScroll.service:uiGridInfiniteScrollService
        * @description This function fires 'needLoadMoreData' or 'needLoadMoreDataTop' event based on scrollDirection
        * @param {Grid} grid the grid we're working on
-       * @param {number} percentage the percentage through the grid that we want to scroll to
+       * @param {number} scrollTop the position through the grid that we want to scroll to
        * @returns {promise} a promise that is resolved when the scrolling finishes
        */
-      adjustInfiniteScrollPosition: function (grid, percentage) {
-        var scrollEvent = new ScrollEvent(grid, null, null, 'ui.grid.adjustInfiniteScrollPosition');
+      adjustInfiniteScrollPosition: function (grid, scrollTop) {
+        var scrollEvent = new ScrollEvent(grid, null, null, 'ui.grid.adjustInfiniteScrollPosition'),
+          visibleRows = grid.getVisibleRowCount(),
+          viewportHeight = grid.getViewportHeight() + grid.headerHeight - grid.renderContainers.body.headerHeight - grid.scrollbarHeight,
+          rowHeight = grid.options.rowHeight,
+          scrollHeight = visibleRows*rowHeight-viewportHeight;
 
         //for infinite scroll, if there are pages upwards then never allow it to be at the zero position so the up button can be active
-        if ( percentage === 0 && grid.infiniteScroll.scrollUp ) {
-          scrollEvent.y = {pixels: 1};
+        if (scrollTop === 0 && grid.infiniteScroll.scrollUp) {
+          // using pixels results in a relative scroll, hence we have to use percentage
+          scrollEvent.y = {percentage: 1/scrollHeight};
         }
         else {
-          scrollEvent.y = {percentage: percentage};
+          scrollEvent.y = {percentage: scrollTop/scrollHeight};
         }
         grid.scrollContainers('', scrollEvent);
       },
@@ -20298,17 +20316,18 @@ module.filter('px', function() {
        * @returns {promise} a promise that is resolved when the scrolling finishes
        */
       dataRemovedTop: function( grid, scrollUp, scrollDown ) {
+        var newVisibleRows, oldTop, newTop, rowHeight;
         service.setScrollDirections( grid, scrollUp, scrollDown );
 
-        var newVisibleRows = grid.renderContainers.body.visibleRowCache.length;
-        var oldScrollRow = grid.infiniteScroll.prevScrolltopPercentage * grid.infiniteScroll.previousVisibleRows;
+        newVisibleRows = grid.renderContainers.body.visibleRowCache.length;
+        oldTop = grid.infiniteScroll.prevScrollTop;
+        rowHeight = grid.options.rowHeight;
 
         // since we removed from the top, our new scroll row will be the old scroll row less the number
         // of rows removed
-        var newScrollRow = oldScrollRow - ( grid.infiniteScroll.previousVisibleRows - newVisibleRows );
-        var newScrollPercent = newScrollRow / newVisibleRows;
+        newTop = oldTop - ( grid.infiniteScroll.previousVisibleRows - newVisibleRows )*rowHeight;
 
-        return service.adjustInfiniteScrollPosition( grid, newScrollPercent );
+        return service.adjustInfiniteScrollPosition( grid, newTop );
       },
 
       /**
@@ -20326,15 +20345,12 @@ module.filter('px', function() {
        * fire infinite scroll events downward
        */
       dataRemovedBottom: function( grid, scrollUp, scrollDown ) {
+        var newTop;
         service.setScrollDirections( grid, scrollUp, scrollDown );
 
-        var newVisibleRows = grid.renderContainers.body.visibleRowCache.length;
-        var oldScrollRow = grid.infiniteScroll.prevScrolltopPercentage * grid.infiniteScroll.previousVisibleRows;
+        newTop = grid.infiniteScroll.prevScrollTop;
 
-        // since we removed from the bottom, our new scroll row will be same as the old scroll row
-        var newScrollPercent = oldScrollRow / newVisibleRows;
-
-        return service.adjustInfiniteScrollPosition( grid, newScrollPercent );
+        return service.adjustInfiniteScrollPosition( grid, newTop );
       }
     };
     return service;
@@ -20421,7 +20437,9 @@ module.filter('px', function() {
         var self = this;
         this.registerPublicApi(grid);
         this.defaultGridOptions(grid.options);
+        grid.moveColumns = {orderCache: []}; // Used to cache the order before columns are rebuilt
         grid.registerColumnBuilder(self.movableColumnBuilder);
+        grid.registerDataChangeCallback(self.verifyColumnOrder, [uiGridConstants.dataChange.COLUMN]);
       },
       registerPublicApi: function (grid) {
         var self = this;
@@ -20531,6 +20549,34 @@ module.filter('px', function() {
           : colDef.enableColumnMoving;
         return $q.all(promises);
       },
+      /**
+       * @ngdoc method
+       * @name updateColumnCache
+       * @methodOf  ui.grid.moveColumns
+       * @description Cache the current order of columns, so we can restore them after new columnDefs are defined
+       */
+      updateColumnCache: function(grid){
+        grid.moveColumns.orderCache = grid.getOnlyDataColumns();
+      },
+      /**
+       * @ngdoc method
+       * @name verifyColumnOrder
+       * @methodOf  ui.grid.moveColumns
+       * @description dataChangeCallback which uses the cached column order to restore the column order
+       * when it is reset by altering the columnDefs array.
+       */
+      verifyColumnOrder: function(grid){
+        var headerRowOffset = grid.rowHeaderColumns.length;
+        var newIndex;
+
+        angular.forEach(grid.moveColumns.orderCache, function(cacheCol, cacheIndex){
+          newIndex = grid.columns.indexOf(cacheCol);
+          if ( newIndex !== -1 && newIndex - headerRowOffset !== cacheIndex ){
+            var column = grid.columns.splice(newIndex, 1)[0];
+            grid.columns.splice(cacheIndex + headerRowOffset, 0, column);
+          }
+        });
+      },
       redrawColumnAtPosition: function (grid, originalPosition, newPosition) {
 
         var columns = grid.columns;
@@ -20548,6 +20594,7 @@ module.filter('px', function() {
             }
           }
           columns[newPosition] = originalColumn;
+          service.updateColumnCache(grid);
           grid.queueGridRefresh();
           $timeout(function () {
             grid.api.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
